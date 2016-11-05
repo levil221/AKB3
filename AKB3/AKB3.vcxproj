@@ -142,7 +142,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="FindingCliques.cpp" />
     <ClCompile Include="Sequence.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
