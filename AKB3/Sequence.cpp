@@ -16,6 +16,7 @@ struct SequenceFragment {
 		this->seqId = seqId;
 		this->begin = begin;
 	}
+	SequenceFragment() {}
 };
 
 struct Sequnece {
