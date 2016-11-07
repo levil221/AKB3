@@ -50,7 +50,7 @@ int main() {
 	makeConnections();
 	cout << "polaczenia utworzne, zaczynam szukac motywow" << endl;
 	//for debuging
-	printGraph();
+	//printGraph();
 	
 	vector<int> emptyPotentialClique, emptySkipedNodes, vertexList;
 	for (int i = 0; i < connections.size(); i++)
@@ -300,14 +300,16 @@ void findCliques(vector<int> potentialClique, vector<int> nodes, vector<int> ski
 
 void findBestClique()
 {
-	for (auto qc : cliques) {
-			int counter = 2;
-			for (int i = 0; i < qc.list.size()-1; i++) {
-				if (qc.list[i + 1] - qc.list[i] > deletionLevel) {
+	int counter;
+
+	for (int c = 0; c < cliques.size();c++) {
+			counter = 1;
+			for (int i = 0; i < cliques[c].list.size()-1; i++) {
+				if (cliques[c].list[i + 1] - cliques[c].list[i] > deletionLevel) {
 					counter++;
-				}
-				qc.score = counter;
+				}			
 		}
+			cliques[c].score = counter;
 	}
 	for (auto qc : cliques) {
 		if (qc.score > maxClinque.score) {
