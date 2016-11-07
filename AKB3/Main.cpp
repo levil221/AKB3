@@ -13,18 +13,20 @@ void printGraph();
 void printMotive();
 void printSequenceWihtMotiv();
 void makeCleanGraph();
+void makeConnections();
 vector<int> findPivots(vector<int>, vector<int>);
 vector<int> findCommonNodes(vector<int>, int);
 void findCliques(vector<int>, vector<int>, vector<int>);
-void makeConnections();
+void findBestClique();
 
 void findCliques(vector<int> potentialClique, vector<int> nodes, vector<int> skiped_nodes);
 
 vector<Sequnece> seqences;
 vector<SequenceFragment*> vertexes;
-vector<vector<int>> connections,cliques;
-vector<int> maxClinque;
-int window, minScore,motiveCounter=1;
+vector<vector<int>> connections;
+vector<Clinque> cliques;
+Clinque maxClinque;
+int window, minScore,motiveCounter=1, deletionLevel;
 HANDLE  hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
 int main() {
@@ -48,7 +50,7 @@ int main() {
 	makeConnections();
 	cout << "polaczenia utworzne, zaczynam szukac motywow" << endl;
 	//for debuging
-	//printGraph();
+	printGraph();
 	
 	vector<int> emptyPotentialClique, emptySkipedNodes, vertexList;
 	for (int i = 0; i < connections.size(); i++)
@@ -56,11 +58,9 @@ int main() {
 	findCliques(emptyPotentialClique, vertexList, emptySkipedNodes);
 	cout << "znaleziono ~" << cliques.size() << " motywów, szukam najdluzszego" << endl;
 	//for debuging
-	//print(cliques);
-
-	for (auto qc : cliques)
-		if (maxClinque.size() < qc.size())
-			maxClinque = qc;
+	//printPotentialCliques(cliques);
+	findBestClique();
+	//
 	printMotive();
 	printSequenceWihtMotiv();
 	cout << "zakonczono prace programu, wcisnij dowolny klawisz by wyjsc...." << endl;
@@ -160,9 +160,9 @@ void printPotentialCliques(vector<vector<int>> input)
 		cout << "\n";
 	}
 }
-//works
+//work
 void printMotive() {
-	for (auto i : maxClinque) {
+	for (auto i : maxClinque.list) {
 		for (auto ch : vertexes[i]->seq) {
 			cout << ch;
 		}
@@ -178,7 +178,7 @@ void printSequenceWihtMotiv()
 
 	for (auto seq : seqences) {
 		cout << seq.seqID << endl;
-		for (auto id: maxClinque) {
+		for (auto id: maxClinque.list) {
 			if (vertexes[id]->seqId == seq.seqID) {
 				startes.push_back(vertexes[id]->begin);
 			}
@@ -222,19 +222,32 @@ void makeCleanGraph() {
 	}
 }
 void makeConnections() {
-	int deletionLevel = ((window / 2) - 1);
-	int same = 0, deletion = 0;;
+	deletionLevel = ((window / 2) - 1);
+	int same = 0, deletion = 1;;
+
 	for (int i = 0; i < vertexes.size() - 1; i++) {
-		for (int j = i + 1; j < vertexes.size(); j++) {
+		for (int j = i+1 ; j < vertexes.size(); j++) {
 			for (int k = 0; k < window; k++) {
 				if (vertexes[i]->seq[k] == vertexes[j]->seq[k]) {
 					same++;
 				}
 				else if (vertexes[j]->score[k] <= minScore) {
 					deletion++;
+					int shift = k+1;
+					while (deletion <= deletionLevel && shift < window) {
+						if (vertexes[i]->seq[shift] == vertexes[j]->seq[k]) {
+							same++;
+							shift++;
+							k++;
+						}
+						else {
+							deletion++;
+							shift++;
+						}
+					}
 				}
 			}
-			if (same+deletion == window && deletion <= deletionLevel) {
+			if (same + deletion == window && deletion <= deletionLevel) {
 				connections[i].push_back(j);
 				connections[j].push_back(i);
 			}
@@ -264,7 +277,7 @@ vector<int> findCommonNodes(vector<int> nodes, int vertex) {
 }
 void findCliques(vector<int> potentialClique, vector<int> nodes, vector<int> skipedNodes) {
 	if (nodes.size() == 0 && skipedNodes.size() == 0) {
-		cliques.push_back(potentialClique);
+		cliques.push_back(Clinque(potentialClique));
 		//cout << "znalezione klike nr " << motiveCounter++ <<endl;
 		return;
 	}
@@ -283,4 +296,23 @@ void findCliques(vector<int> potentialClique, vector<int> nodes, vector<int> ski
 		
 		
 	}
+}
+
+void findBestClique()
+{
+	for (auto qc : cliques) {
+			int counter = 2;
+			for (int i = 0; i < qc.list.size()-1; i++) {
+				if (qc.list[i + 1] - qc.list[i] > deletionLevel) {
+					counter++;
+				}
+				qc.score = counter;
+		}
+	}
+	for (auto qc : cliques) {
+		if (qc.score > maxClinque.score) {
+			maxClinque = qc;
+		}
+	}
+	
 }

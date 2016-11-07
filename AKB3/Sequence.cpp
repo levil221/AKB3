@@ -32,3 +32,13 @@ struct Sequnece {
 		}
 	}
 };
+
+struct Clinque {
+	vector<int> list;
+	int score;
+
+	Clinque(vector<int> input){
+		list = input;
+	}
+	Clinque() {}
+};
