@@ -7,8 +7,9 @@ using namespace std;
 struct SequenceFragment {
 	vector<char> seq;
 	vector<int>score;
-	string seqId;
+	string seqId, seqString;
 	int begin;
+	int end;
 
 	SequenceFragment(string seqId, vector<char> seq, vector<int> score,int begin) {
 		this->seq = seq;
@@ -41,4 +42,11 @@ struct Clinque {
 		list = input;
 	}
 	Clinque() {}
+};
+
+struct Motive {
+	vector<char> consensus;
+	vector<SequenceFragment> fragments;
+	 
+	Motive(){}
 };
