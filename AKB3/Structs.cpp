@@ -4,29 +4,34 @@
 
 using namespace std;
 
-struct SequenceFragment {
-	vector<char> seq;
-	vector<int>score;
+struct SequenceVertex
+{
+	string seq;
 	string seqId, seqString;
 	int begin;
-	int end;
-
-	SequenceFragment(string seqId, vector<char> seq, vector<int> score,int begin) {
+	
+	SequenceVertex(string seqId, string seq, int begin)
+	{
 		this->seq = seq;
-		this->score = score;
 		this->seqId = seqId;
 		this->begin = begin;
 	}
-	SequenceFragment() {}
+
+	SequenceVertex()
+	{
+	}
 };
 
-struct Sequnece {
+struct Sequnece
+{
 	string seqID, seq, scoreString;
 	vector<int> score;
 
-	void makeScoreTable() {
+	void makeScoreTable()
+	{
 		stringstream stream(scoreString);
-		while (stream) {
+		while(stream)
+		{
 			int buffer;
 			stream >> buffer;
 			score.push_back(buffer);
@@ -34,19 +39,44 @@ struct Sequnece {
 	}
 };
 
-struct Clinque {
-	vector<int> list;
-	int score;
+struct Connection
+{
+	int vertexId, score;
+	Connection(){};
 
-	Clinque(vector<int> input){
-		list = input;
+	Connection(int vertex_id, int score)
+		: vertexId(vertex_id),
+		  score(score)
+	{
 	}
-	Clinque() {}
+	bool operator ==(const Connection &v) const
+	{
+		if (this->vertexId == v.vertexId) return true;
+		return false;
+	}
 };
 
-struct Motive {
-	vector<char> consensus;
+struct SequenceFragment
+{
+	string seqId;
+	string seq;
+	int begining, end, id;
+	SequenceFragment(string seq_id, int begining, int end, int id,string seq)
+		: seqId(seq_id),
+		  begining(begining),
+		  end(end),
+		  id(id),
+		  seq(seq)
+	{
+	}
+};
+
+struct Motive
+{
+	string consensus;
 	vector<SequenceFragment> fragments;
-	 
-	Motive(){}
+
+	Motive()
+	{
+	}
 };
