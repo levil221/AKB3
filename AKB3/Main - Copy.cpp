@@ -198,8 +198,10 @@ void makeConnections()
 	
 	for (int i = 0; i < krawedzie.size() - 1; i++)
 	{
-		for (int j = i+windowSize; j < krawedzie.size(); j++)
+		for (int j = i; j < krawedzie.size(); j++)
 		{
+			if ((krawedzie[i]->seqId == krawedzie[j]->seqId && j - i < 3*windowSize) )// nie sa za blisko siebei
+				continue;
 			for (int k = 0; k < windowSize; k++)
 			{
 				//z pominieciem 
@@ -351,7 +353,8 @@ vector<Connection> findBestClique()
 	}
 	for (int i = 0; i < kliki.size(); i++)
 	{
-		
+		if (kliki[i].size() > maxCliqSize)
+		{
 			int newScore = 0;
 			for(int k=0;k<  kliki[i].size()-1;k++)
 			{
@@ -362,12 +365,12 @@ vector<Connection> findBestClique()
 					newScore--;
 			}
 			int klikScore = maxCliqID != -1 ? wynikKliki[maxCliqID] : 0;
-			if (score < newScore) {
+			if (score < newScore &&	wynikKliki[i] > klikScore) {
 				score = newScore;
 				maxCliqSize = kliki[i].size();
 				maxCliqID = i;
 			}
-		
+		}
 	}
 	if(maxCliqID == -1)
 	{
@@ -391,7 +394,15 @@ vector<Connection> findClique()
 	}
 	vector<Connection> potentialClique, skipedNodes, wszystkiePolaczenia = polaczenia[maxDegID];
 	wszystkiePolaczenia.push_back(Connection(maxDegID, windowSize));
-	
+	for(auto sex:sekwencje)
+	{
+		cout << sex.second.seq << endl;
+	}
+	cout << endl << endl;
+	for(auto x:wszystkiePolaczenia)
+	{
+		cout << x.vertexId<<": "<< krawedzie[x.vertexId]->seqId <<" -> "<< krawedzie[x.vertexId]->seq << endl;
+	}
 	bronKerbosh(potentialClique, wszystkiePolaczenia, skipedNodes);
 	//bronKerbosh(potentialClique, polaczenia[maxDegID], skipedNodes);
 	
