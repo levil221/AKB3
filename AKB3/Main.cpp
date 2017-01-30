@@ -45,7 +45,7 @@ int main()
 	cout << "wczytano pliki" << endl;
 	cout << "podaj rozmiar okna(4-7)" << endl;
 	cin >> windowSize;
-	deletionLevel = ((windowSize / 2) - 1);
+	deletionLevel = windowSize * 0.4f;
 	cout << endl << "podaj minimalna tolerowana ocene nukleotydu" << endl;
 	cin >> minScore;
 
@@ -171,7 +171,7 @@ void buildGraph()
 {
 	for (auto seq : sekwencje)
 	{
-		int size = seq.second.seq.size() / windowSize;
+		int size = seq.second.seq.size() - windowSize;
 		for (int i = 0; i <= size; i++)
 		{
 			string seqSubString;
@@ -194,12 +194,14 @@ void buildGraph()
 }
 void makeConnections()
 {
-	int same = 0, deletion = 1;;
+	int same = 0, deletion = 0;;
 	
 	for (int i = 0; i < krawedzie.size() - 1; i++)
 	{
-		for (int j = i+windowSize; j < krawedzie.size(); j++)
+		for (int j = i+1; j < krawedzie.size(); j++)
 		{
+			if(krawedzie[i]->seqId == krawedzie[j]->seqId)
+				continue;
 			for (int k = 0; k < windowSize; k++)
 			{
 				//z pominieciem 
@@ -210,7 +212,6 @@ void makeConnections()
 				{
 					same++;
 				}
-				else k++;
 			}
 
 			if (same >= windowSize - deletionLevel )
@@ -220,77 +221,77 @@ void makeConnections()
 				polaczenia[i].push_back(connectJ);
 				polaczenia[j].push_back(connectI);
 			}
-			else
-			{
-				//przesuniecie w lewo
-				//A  C  T  A  T	 G
-				//|	 |	|	 \	\	 
-				//A  C  T  G  A  T
-				deletion = 0;
-				same = 0;
-				for (int k = 0; k < windowSize; k++) {
-					if (krawedzie[i]->seq[k] == krawedzie[j]->seq[k]) {
-						same++;
-					}
-					else {
-						deletion++;
-						int shift = k + 1;
-						while (deletion <= deletionLevel && shift < windowSize) {
-							if (krawedzie[i]->seq[shift] == krawedzie[j]->seq[k]) {
-								same++;
-								shift++;
-								k++;
-							}
-							else {
-								deletion++;
-								shift++;
-							}
-						}
-					}
-				}
-				if (same + deletion == windowSize && deletion <= deletionLevel)
-				{
-					Connection connectI(i, same);
-					Connection connectJ(j, same);
-					polaczenia[i].push_back(connectJ);
-					polaczenia[j].push_back(connectI);
-				}
-				else {
-					//przesuniecie w prawo
-					//A  C  G  T  G	 A
-					//|	 |	  /  /  /	 
-					//A  C  T  G  A  T
-					deletion = 0;
-					same = 0;
-					for (int k = 0; k < windowSize; k++) {
-						if (krawedzie[i]->seq[k] == krawedzie[j]->seq[k]) {
-							same++;
-						}
-						else {
-							deletion++;
-							int shift = k + 1;
-							while (deletion <= deletionLevel && shift < windowSize) {
-								if (krawedzie[j]->seq[shift] == krawedzie[i]->seq[k]) {
-									same++;
-									shift++;
-									k++;
-								}
-								else {
-									deletion++;
-									shift++;
-								}
-							}
-						}
-					}
-					if (same + deletion == windowSize && deletion <= deletionLevel)
-					{
-						Connection connectI(i, same);
-						Connection connectJ(j, same);
-						polaczenia[i].push_back(connectJ);
-						polaczenia[j].push_back(connectI);
-					}
-				}
-			}
+//			else
+//			{
+//				//przesuniecie w lewo
+//				//A  C  T  A  T	 G
+//				//|	 |	|	 \	\	 
+//				//A  C  T  G  A  T
+//				deletion = 0;
+//				same = 0;
+//				for (int k = 0; k < windowSize; k++) {
+//					if (krawedzie[i]->seq[k] == krawedzie[j]->seq[k]) {
+//						same++;
+//					}
+//					else {
+//						deletion++;
+//						int shift = k + 1;
+//						while (deletion <= deletionLevel && shift < windowSize) {
+//							if (krawedzie[i]->seq[shift] == krawedzie[j]->seq[k]) {
+//								same++;
+//								shift++;
+//								k++;
+//							}
+//							else {
+//								deletion++;
+//								shift++;
+//							}
+//						}
+//					}
+//				}
+//				if (same + deletion == windowSize && deletion <= deletionLevel)
+//				{
+//					Connection connectI(i, same);
+//					Connection connectJ(j, same);
+//					polaczenia[i].push_back(connectJ);
+//					polaczenia[j].push_back(connectI);
+//				}
+//				else {
+//					//przesuniecie w prawo
+//					//A  C  G  T  G	 A
+//					//|	 |	  /  /  /	 
+//					//A  C  T  G  A  T
+//					deletion = 0;
+//					same = 0;
+//					for (int k = 0; k < windowSize; k++) {
+//						if (krawedzie[i]->seq[k] == krawedzie[j]->seq[k]) {
+//							same++;
+//						}
+//						else {
+//							deletion++;
+//							int shift = k + 1;
+//							while (deletion <= deletionLevel && shift < windowSize) {
+//								if (krawedzie[j]->seq[shift] == krawedzie[i]->seq[k]) {
+//									same++;
+//									shift++;
+//									k++;
+//								}
+//								else {
+//									deletion++;
+//									shift++;
+//								}
+//							}
+//						}
+//					}
+//					if (same + deletion == windowSize && deletion <= deletionLevel)
+//					{
+//						Connection connectI(i, same);
+//						Connection connectJ(j, same);
+//						polaczenia[i].push_back(connectJ);
+//						polaczenia[j].push_back(connectI);
+//					}
+//				}
+//			}
 			same = 0;
 			deletion = 0;
 		}
@@ -362,7 +363,7 @@ vector<Connection> findBestClique()
 					newScore--;
 			}
 			int klikScore = maxCliqID != -1 ? wynikKliki[maxCliqID] : 0;
-			if (score < newScore) {
+			if (score < newScore && klikScore < wynikKliki[i]) {
 				score = newScore;
 				maxCliqSize = kliki[i].size();
 				maxCliqID = i;
@@ -423,7 +424,7 @@ Motive findMotive(vector<Connection> clq)
 		}
 
 		bool nucWasAdded = false;
-		char nukleotyd;
+		char nukleotyd='_';
 		int iloscNukl = 0;
 		for (auto nuc : Nukleotydy)
 		{
@@ -434,10 +435,6 @@ Motive findMotive(vector<Connection> clq)
 			}
 		}
 		motive.consensus.push_back(nukleotyd);
-		nucWasAdded = true;
-
-		if (!nucWasAdded)
-			motive.consensus.push_back('_');
 	}
 	cout << "znaleziono motyw: " << motive.consensus << endl;
 	return motive;
@@ -452,7 +449,7 @@ Motive extendMotive(vector<SequenceFragment> fragments,bool directionLeft)
 		int ext=0;
 		if (directionLeft)
 		{
-			ext = frag.begining - extendedWindow <= 0 ? -1 : frag.begining - extendedWindow;
+			ext = frag.begining - extendedWindow < 0 ? -1 : frag.begining - extendedWindow;
 			if(ext>=0)
 			{
 				SequenceFragment extendedFragment(frag.seqId, ext, frag.begining-1, frag.id,"");
@@ -465,7 +462,7 @@ Motive extendMotive(vector<SequenceFragment> fragments,bool directionLeft)
 		}
 		else {
 			ext = frag.end + extendedWindow >= sekwencje[frag.seqId].seq.size() ? -1 : frag.end + extendedWindow;
-			if (ext>0)
+			if (ext>=0)
 			{
 				SequenceFragment extendedFragment(frag.seqId, frag.end + 1, ext, frag.id,"");
 				for (int i = frag.end + 1; i <= ext; i++)
@@ -495,11 +492,11 @@ Motive extendMotive(vector<SequenceFragment> fragments,bool directionLeft)
 			}
 
 			char nukleotyd = '_';
-			int iloscNukl = 0;
+			int iloscNukl = fragments.size() *0.4f;
 
 			for (auto nuc : Nukleotydy)
 			{
-				if (consensusColumn[nuc] >= motyw.fragments.size()*0.50f  && consensusColumn[nuc] > iloscNukl)
+				if ( consensusColumn[nuc] > iloscNukl)
 				{
 					iloscNukl = consensusColumn[nuc];
 					nukleotyd = nuc;
